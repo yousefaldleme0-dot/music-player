@@ -39,7 +39,14 @@ jobs:
 
       - name: Build debug APK
         working-directory: proj
-        run: gradle assembleDebug --no-daemon --stacktrace
+        run: |
+          gradle assembleDebug --no-daemon --console=plain 2>&1 | tee build.log
+
+      - name: Show errors only
+        if: failure()
+        working-directory: proj
+        run: |
+          grep -n -B2 -A12 -E "^e: |What went wrong|error:|FAILED" build.log | head -80
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
